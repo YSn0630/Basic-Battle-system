@@ -31,8 +31,8 @@
 #방어: 3~8 v
 
 # 다음 턴 지속 적용 상태이상
-#고조: 공격 4~9 / 방어 2~7 
-#위축: 공격 2~7 / 방어 4~9 
+#고조: 공격 4~9 / 방어 2~7 v
+#위축: 공격 2~7 / 방어 4~9 v
 #취약: +5 피해 
 
 # 다음 턴 즉시 적용 상태이상
@@ -110,6 +110,15 @@ def critDMG(hp, special):
     special = 0
     return hp, special
 
+# 기선 제압(취약)
+def vuln(special, state, delay_state):
+    if delay_state['vulnOn']:                       # 이전 턴 검사 및 적용
+        state['vuln'] = 1
+    if special == 1:                                # 이번 턴 적용 및 초기화
+        delay_state['vulnOn'] = True
+    else:
+        delay_state['vulnOn'] = False
+
 
 def simulate_game():
 
@@ -159,16 +168,16 @@ def simulate_game():
         # 합 진행
         if action1=='attack' and action2=='attack':             # 공격 - 공격
             if val1 > val2:
-                hp2 -= (val1 + state2['vuln'] * 2)
+                hp2 -= (val1 + state2['vuln'] * 5)
             elif val1 < val2:
-                hp1 -= (val2 + state1['vuln'] * 2)
+                hp1 -= (val2 + state1['vuln'] * 5)
             else:
                 continue
         elif action1=='attack' and action2=='defense':         # 공격 - 방어
             if val1 > val2 and special1 == 1:
                 hp2, special1 = critDMG(hp2, special1)
             elif val1 > val2:
-                dmg = val1 - val2 + state2['vuln'] * 2
+                dmg = val1 - val2 + state2['vuln'] * 5
                 if dmg <= 0: dmg = 0
                 hp2 -= dmg
             elif val1 < val2:
@@ -179,7 +188,7 @@ def simulate_game():
             if val1 < val2 and special2 == 1:
                 hp1, special2 = critDMG(hp1, special2)
             elif val1 < val2:
-                dmg = val2 - val1 + state1['vuln'] * 2
+                dmg = val2 - val1 + state1['vuln'] * 5
                 if dmg <= 0: dmg = 0
                 hp1 -= dmg
             elif val1 > val2:
@@ -189,8 +198,10 @@ def simulate_game():
         else:                                                   # 방어 - 방어
             if val1 < val2:
                 state1['broken'] = 1
+                vuln(special2, state1, delay_state1)
             elif val1 > val2:
                 state2['broken'] = 1
+                vuln(special1, state1, delay_state1)
             else:
                 continue
 
