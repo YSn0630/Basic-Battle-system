@@ -21,8 +21,26 @@
 
 # 특수 상태이상
 # 회광반조(1회성): 턴 시작 시 자신의 체력이 절반 이하일 경우, 이번 턴과 다음 턴 동안 보유한 모든 상태이상을 제거하고,
-#               제거한만큼 공격&방어의 최종 위력 증가.
+#               제거한 2배만큼 공격&방어의 최종 위력 증가. 상태이상이 없을 경우, 최종 위력 + 4
 #               (한 게임 동안 각각 한 번씩만 발동함.)
+
+
+# 요약
+
+#공격: 3~9
+#방어: 3~9
+
+#고조: 공격 4~10 / 방어 2~8
+#위축: 공격 2~8 / 방어 4~10
+#취약: 받는 피해 +5
+
+#마비: 최종 공격 위력 -2
+#무장 해제: 최종 방어 위력 -2
+
+#역린: 방어를 무시한 고정 피해 10
+#기선 제압: 취약 부여
+
+#회광반조: 강력한 일회성 버프(2턴 지속)
 
 
 import random
@@ -76,6 +94,10 @@ def burst_check(hp, burst, p, state, delay_state):
     if hp <= 15 and burst < 2:
         burst += 1
         p = count_value_one(state)
+        if p > 0:
+            p = p * 2
+        elif p <= 0:
+            p = 4
         for v in delay_state.values():
             if v:
                 v = False
@@ -91,22 +113,19 @@ def critDMG(hp, special, state):
     return hp, special
 
 # 기선 제압(취약)
-def vuln(special, state, delay_state):
-    if delay_state['vulnOn']:                       # 이전 턴 검사 및 적용
+def applyVuln(state, dstate):
+    if dstate['vulnOn']:
         state['vuln'] = 1
-    if special == 1:                                # 이번 턴 적용 및 초기화
-        delay_state['vulnOn'] = True
-    else:
-        delay_state['vulnOn'] = False
+        dstate['vulnOn'] = False
 
 def printstate(state, dstate):
     R = []
-    if dstate['raiseOn']:
+    if state['raise'] == 1:
         R.append('고조')
-    if dstate['tensionOn']:
+    if state['tension'] == 1:
         R.append('위축')
     if dstate['vulnOn']:
-        R.append('취약')
+        R.append('!!취약!!')
     if state['paralysis'] == 1:
         R.append('마비')
     if state['broken'] == 1:
@@ -124,7 +143,7 @@ def printbattleui(type1, type2, val1, val2, dmg):
         texttype2 = '방어'
     print(f"\n\n 플레이어 행동: {texttype1} ({val1})\t적 행동: {texttype2} ({val2})")
     if val1 == val2:
-        print(f"\n 격전 !\n {val1} >>> <<< {val2}\n")
+        print(f"\n ! 격전 !\n {val1} >>> <<< {val2}\n")
     elif val1 > val2:
         print(f"\n 합 승리 !\n {val1} >>> >>> {val2}\n")
         if type1 == 'attack':
@@ -199,6 +218,10 @@ def simulate_game():
         if val1 < 0: val1 = 0
         if val2 < 0: val2 = 0
 
+        # 이전 턴에 획득한 상태이상 적용 및 판별자 초기화
+        applyVuln(state1, delay_state1)
+        applyVuln(state2, delay_state2)
+
         # 합 진행
         if action1=='attack' and action2=='attack':             # 공격 - 공격
             if val1 > val2:
@@ -247,17 +270,17 @@ def simulate_game():
         else:                                                   # 방어 - 방어
             if val1 < val2:
                 state1['broken'] = 1
-                vuln(special2, state1, delay_state1)
                 printbattleui(action1, action2, val1, val2, 0)
                 print("\n 반동 !\n 다음 턴 동안 플레이어에게 무장 해제 발생.")
                 if special2 == 1:
+                    delay_state1['vulnOn'] = True
                     print("\n\n !! !! 기선 제압 !! !!\n 다음 턴 동안 플레이어가 추가적으로 취약 5 얻음\n")
             elif val1 > val2:
                 state2['broken'] = 1
-                vuln(special1, state2, delay_state2)
                 printbattleui(action1, action2, val1, val2, 0)
                 print("\n 반동 !\n 다음 턴 동안 적에게 무장 해제 발생.")
                 if special1 == 1:
+                    delay_state2['vulnOn'] = True
                     print("\n\n !! !! 기선 제압 !! !!\n 다음 턴 동안 적이 추가적으로 취약 5 얻음\n")
             else:
                 printbattleui(action1, action2, val1, val2, 0)
