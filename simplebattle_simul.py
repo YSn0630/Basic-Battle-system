@@ -1,134 +1,28 @@
-import random
+# 공격은 3 ~ 9의 randint
+# 방어는 3 ~ 9의 randint
 
-def battle_value(s, type, burst):           # 위력 산출
-    if s == 0:
-        s = 1
-    i = 0; a = 0; d = 0
-    if burst == 1:
-        i = random.randint(1,2)
-        if i == 1:
-            a += s
-        else:
-            d += s
+# 매 턴 양측은 공격 혹은 방어 중 한 가지를 선택하여 행동.
+# 값이 더 높은 쪽의 승자 독식 구조
+# 양측의 체력은 30. 체력이 0 이하로 떨어지면 패배.
 
-    if type == 'A' or type == 'a':
-        p = random.randint(1, 10)
-        p += p + a
-        return p
-    elif type == 'D' or type == 'd':
-        p = random.randint(3,7)
-        power = p + d
-        return power
-    
-def battle_result(user_type, enemy_type, up, ep):            # 전투 결과 산출
-    if user_type == enemy_type:
+# 상태이상
+# 원본 값이 최댓값: 다음 턴 동안 고조(최종 공격 위력 +1, 최종 수비 위력 -1) 얻음
+# 원본 값이 최솟값: 다음 턴 동안 위축(최종 공격 위력 -1, 최종 수비 위력 +1) 얻음
 
-    else:
-        if user_type == "attack":
+# 공>공: 공격 값만큼 일방 피해
+# 공>방: (공격-방어) 값만큼 일방 피해 
+# 방>공: 다음 턴 동안 상대에게 마비(최종 공격 위력 감소 -2) 부여
+# 방>방: 다음 턴 동안 상대에게 무장 해제(최종 방어 위력 감소 -2) 부여
+# 값이 동일할 경우, 격전. 양측 피해 무산
 
-        else:
+# 특수 상황
+# 역린: 공>방 시, 기본 공격 위력이 7이면, 방어를 무시한 고정 피해 10
+# 기선 제압: 방>방 시, 기본 위력이 7이면, 다음 턴에 취약 5 부여
 
-    return r
-
-def special_buffs(s):               # 상태이상
-
-    return s
-
-
-userHP = 100; enemyHP = 100   # 체력
-us = 0; es = 0              # 상태이상
-ub = 0; eb = 0              # 버스트 돌입 여부
-
-t = 1                       # 경과 턴
-
-
-print(' --룰북--\n 공격( 1 ~ 10 ) : 값이 더 클 경우, 공격 값만큼 피해.\n 수비( 3 ~ 7 ) : 값이 더 클 경우, 값의 절반만큼 반동 피해.' \
-' 상태이상 : 공격-수비에서 공격이 더 클 경우, \"출혈\" 부여.\n  수비가 더 클 경우, \"마비\" 부여.' \
-'   유형에 관계없이 본인의 값이 최댓값이 나올 경우, \"고조\" 획득. 최솟값일 경우, \"위축\" 획득.' \
-'   수비-수비의 경우, 값이 적은 측에게 \"취약\" 부여.' \
-'   모든 상태이상은 부여된 그 다음 턴 동안만 유효함.\n 유형에 관계없이 양측 값이 같을 경우, 상태이상 및 피해 무산.' \
-' 체력이 절반 이하일 경우, 2턴 동안 \"버스트\" 돌입.' \
-' 버스트 : 모든 상태이상을 제거하고, 그 수치만큼 \"회광반조\"를 획득(최솟값 1). 공격과 수비의 최종 위력 + \"회광반조 수치\"' \
-'\n 버스트 외의 다른 모든 상태이상을 자세히 보려면 \'상태이상 룰\' 또는 \'S\' 입력.')
-
-while(userHP > 0 and enemyHP > 0):
-
-
-
-    p = input('{}턴, 플레이어 HP: {} / 적 HP: {}\n행동 선택\n\n공격(\'A\' 입력, 1 ~ 10)\n수비(\'D\' 입력, 3 ~ 7)\n'.format(t,userHP,enemyHP))
-    if p == "상태이상 룰" or p == 'S' or p == 's':
-        print('\n ---룰북(상태이상)---\n 출혈: [ 공격>수비 로 부여 ] 다음 턴 동안 받는 피해량 \'+2\'' \
-              ' 마비: [ 공격<수비 로 부여 ] 다음 턴 동안 최종 공격 위력 \'-2\'' \
-              ' 취약: [ 수비>수비 로 부여 ] 다음 턴 동안 최종 수비 위력 \'-2\'' \
-              ' 고조: [ 최댓값일 경우 ] 다음 턴 동안 자신의 최종 공격 위력 \'+1\', 최종 수비 위력 \'-1\'' \
-              ' 위축: [ 최솟값일 경우 ] 다음 턴 동안 자신의 최종 공격 위력 \'-1\', 최종 수비 위력 \'+1\'' \
-              ' 격전: [ 양측의 값이 동일 ] 최대/최소로 인한 상태이상 무시, 양측 피해 무산.' \
-              '\n 특수 상태이상(3)\n 역린: [ 공격>수비에서 공격 값이 7인 경우 ] 출혈을 부여하지 않는 대신, ')
-
-    ep = random.randint(1,2)                                    # 적 행동 결정 (1: 공격 / 2: 수비 )
-    if ep == 1:
-        ep = '공격'
-    else:
-        ep = '수비'
-
-    if p == 'A' or p == 'a':
-        up = final_value(us, p, ub); p = '공격'
-        if ep == 1:                                             # 공격 - 공격
-            epp = int(random.randint(1, 10)); ep = '공격'
-            if up > epp:
-                enemyHP -= up
-                r = '승. {} 만큼 피해!'.format(up)
-            elif up < epp:
-                userHP -= epp
-                r = '패. {} 만큼 피해 받음!'.format(epp)
-            else:
-                r = '격전, 양측 피해 무산'
-        else:                                                   # 공격 - 수비
-            epp = int(random.randint(3, 7)); ep = '수비'
-            if up > epp:
-                enemyHP -= (up - epp)
-                r = '적 방어 파괴. 초과 피해 {} 발생!'.format(up-epp)
-            elif up < epp:
-                userHP -= epp//2
-                r = '공격 실패. 반동 피해 {} 받음.'.format(epp//2)
-            else:
-                r = '피해 상쇄'
-
-    elif p == 'D' or p == 'd':
-        up = int(random.randint(3, 7)); p = '수비'
-        if ep == 1:                                              # 수비 - 공격
-            epp = int(random.randint(1, 10)); ep = '공격'
-            if up > epp:
-                enemyHP -= up//2
-                r = '방어 성공. {} 만큼 반동 피해!'.format(up//2)
-            elif up < epp:
-                userHP -= (epp - up)
-                r = '방어 파괴됨. 초과 피해 {} 받음'.format(epp-up)
-            else:
-                r = '피해 상쇄'
-        else:                                                    # 수비 - 수비
-            epp = int(random.randint(3, 7)); ep = '수비'
-            r = '상쇄'
-
-
-    if error != 1:
-        print('\n {}턴 결과\n 플레이어 행동 : {}[{}]\n 적 행동 : {}[{}]\n {}\n\n'.format(t, p, up, ep, epp, r))
-        t += 1
-
-
-class Endgame:
-    def __init__(self, userHP, enemyHP):
-        Endgame.userHP = userHP
-        Endgame.enemyHP = enemyHP
-        
-
-if userHP <= 0:
-    print('\n 패배 !\n 경과한 턴: {}\n 적 남은 체력: {}'.format(t-1, enemyHP))
-elif enemyHP <= 0:
-    print('\n 승리 !\n 경과한 턴: {}\n 플레이어 남은 체력: {}'.format(t-1, userHP))
-elif userHP <= 0 and enemyHP <= 0:
-    print('\n 공멸 !\n 경과한 턴: {}'.format(t-1))
-
+# 특수 상태이상
+# 회광반조(1회성): 턴 시작 시 자신의 체력이 절반 이하일 경우, 이번 턴과 다음 턴 동안 보유한 모든 상태이상을 제거하고,
+#               제거한만큼 공격&방어의 최종 위력 증가.
+#               (한 게임 동안 각각 한 번씩만 발동함.)
 
 
 import random
@@ -156,14 +50,14 @@ def origin_value_buff(p, action, special, val, state, delay_state):
             i -= 1
         else:
             i += 1
-    if val == 8:
-        state['raise'] += 1
+    if val == 9:
+        state['raise'] = 1
         delay_state['raiseOn'] = True
     elif val == 3:
-        state['tension'] += 1
+        state['tension'] = 1
         delay_state['tensionOn'] = True
     elif val == 7:
-        special += 1            # 역린, 만전 확인용 변수
+        special = 1            # 역린, 만전 확인용 변수
     else:
         delay_state['raiseOn'] = False
         delay_state['tensionOn'] = False                # 이전 턴에 상태이상을 얻지 않았을 경우, 상태이상 초기화
@@ -179,7 +73,7 @@ def value_debuffs(action, state):
     
 # 버스트 체크 및 실행
 def burst_check(hp, burst, p, state, delay_state):    
-    if hp <= 50 and burst < 2:
+    if hp <= 15 and burst < 2:
         burst += 1
         p = count_value_one(state)
         for v in delay_state.values():
@@ -190,9 +84,9 @@ def burst_check(hp, burst, p, state, delay_state):
     return p, burst
 
 # 역린
-def critDMG(hp, special):
+def critDMG(hp, special, state):
     if special == 1:
-        hp -= 10
+        hp -= (10 + state['vuln'] * 5)
     special = 0
     return hp, special
 
@@ -205,13 +99,48 @@ def vuln(special, state, delay_state):
     else:
         delay_state['vulnOn'] = False
 
+def printstate(state, dstate):
+    R = []
+    if dstate['raiseOn']:
+        R.append('고조')
+    if dstate['tensionOn']:
+        R.append('위축')
+    if dstate['vulnOn']:
+        R.append('취약')
+    if state['paralysis'] == 1:
+        R.append('마비')
+    if state['broken'] == 1:
+        R.append('무장해제')
+    return R
+
+def printbattleui(type1, type2, val1, val2, dmg):
+    if type1 == 'attack':
+        texttype1 = '공격'
+    else:
+        texttype1 = '방어'
+    if type2 == 'attack':
+        texttype2 = '공격'
+    else:
+        texttype2 = '방어'
+    print(f"\n\n 플레이어 행동: {texttype1} ({val1})\t적 행동: {texttype2} ({val2})")
+    if val1 == val2:
+        print(f"\n 격전 !\n {val1} >>> <<< {val2}\n")
+    elif val1 > val2:
+        print(f"\n 합 승리 !\n {val1} >>> >>> {val2}\n")
+        if type1 == 'attack':
+            print(f" 적에게 체력 피해 {dmg} 가함 ")
+    elif val1 < val2:
+        print(f"\n 합 패배...\n {val1} <<< <<< {val2}\n")
+        if type2 == 'attack':
+            print(f" 플레이어 체력 피해 {dmg} 받음 ")
+
 
 def simulate_game():
 
     # 기본 변수 초기화
     state1, state2 = { 'raise': 0, 'tension': 0, 'vuln': 0, 'paralysis': 0, 'broken': 0 }, \
         { 'raise': 0, 'tension': 0, 'vuln': 0, 'paralysis': 0, 'broken': 0 }
-    hp1, hp2 = 20, 20
+    hp1, hp2 = 30, 30
     turn = 0
     special1, special2 = 0, 0       # 특수 효과 판별용 변수 - 역린, 기선제압
     delay_state1, delay_state2 = { 'raiseOn': False, 'tensionOn': False, 'vulnOn': False }, \
@@ -220,9 +149,28 @@ def simulate_game():
 
     while hp1 > 0 and hp2 > 0:
         turn += 1
-        p1, p2 = 0, 0                   # 위력 증감 변수
+        p1, p2 = 0, 0                   # 위력 증감 변수 초기화
 
-        action1 = random.choice(['attack','defense'])
+        print(f"\n\n--- 제 {turn}턴 ---\n\n 플레이어 HP: {hp1}\t 적 HP: {hp2}\n")
+        R1 = printstate(state1, delay_state1); print(" 플레이어 상태 이상: ", *R1)
+        if hp1 <= 15 and burst1 < 2:
+            print("\n !! 현재 플레이어 회광반조 적용 중 !!\n")
+        R2 = printstate(state2, delay_state2); print(" 적 상태이상: ", *R2)
+        if hp2 <= 15 and burst2 < 2:
+            print("\n !! 현재 적 회광반조 적용 중 !!\n")
+
+        try:
+            userAct = input("\n 행동 입력 < 공격: A ( 3 ~ 9 ) / 수비: D ( 3 ~ 9 ) > ")
+
+            if userAct == 'a' or userAct == 'A':
+                action1 = 'attack'
+            elif userAct == 'd' or userAct == 'D':
+                action1 = 'defense'
+        except Exception as e:
+            print('error', e)
+            turn -= 1
+            continue
+
         action2 = random.choice(['attack','defense'])
         val1 = attack_value() if action1=='attack' else defense_value()
         val2 = attack_value() if action2=='attack' else defense_value()
@@ -239,11 +187,11 @@ def simulate_game():
             p2 -= value_debuffs(action2, state2)
 
         # 상태이상 초기화 및 턴 시작 시 상태이상(고조, 위축, 취약, 역린, 기선 제압) 산출 및 적용
-        state1, state2 = { 'raise': 0, 'tension': 0, 'vuln': 0, 'paralysis': 0, 'broken': 0, 'struggle': 0 }, \
-        { 'raise': 0, 'tension': 0, 'vuln': 0, 'paralysis': 0, 'broken': 0, 'struggle': 0 }
+        state1, state2 = { 'raise': 0, 'tension': 0, 'vuln': 0, 'paralysis': 0, 'broken': 0 }, \
+        { 'raise': 0, 'tension': 0, 'vuln': 0, 'paralysis': 0, 'broken': 0 }
 
         p1, special1 = origin_value_buff(p1, action1, special1, val1, state1, delay_state1)
-        p1, special2 = origin_value_buff(p2, action2, special2, val2, state2, delay_state2)
+        p2, special2 = origin_value_buff(p2, action2, special2, val2, state2, delay_state2)
 
         # 턴 시작, 최종 위력 산출 및 음수 방지 조정
         val1 += p1
@@ -255,40 +203,73 @@ def simulate_game():
         if action1=='attack' and action2=='attack':             # 공격 - 공격
             if val1 > val2:
                 hp2 -= (val1 + state2['vuln'] * 5)
+                printbattleui(action1, action2, val1, val2, (val1 + state2['vuln'] * 5))
             elif val1 < val2:
                 hp1 -= (val2 + state1['vuln'] * 5)
+                printbattleui(action1, action2, val1, val2, (val2 + state1['vuln'] * 5))
             else:
+                printbattleui(action1, action2, val1, val2, 0)
                 continue
         elif action1=='attack' and action2=='defense':         # 공격 - 방어
             if val1 > val2 and special1 == 1:
-                hp2, special1 = critDMG(hp2, special1)
+                hp2, special1 = critDMG(hp2, special1, state2)
+                print("\n\n !!! !!! 역린 !!! !!!")
+                printbattleui(action1, action2, val1, val2, (10 + state2['vuln'] * 5))
             elif val1 > val2:
                 dmg = val1 - val2 + state2['vuln'] * 5
                 if dmg <= 0: dmg = 0
                 hp2 -= dmg
+                printbattleui(action1, action2, val1, val2, dmg)
             elif val1 < val2:
-                state1['paralysis'] += 1
+                state1['paralysis'] = 1
+                printbattleui(action1, action2, val1, val2, 0)
+                print("\n 반동 !\n 다음 턴 동안 플레이어에게 마비 발생.")
             else:
+                printbattleui(action1, action2, val1, val2, 0)
                 continue
         elif action1=='defense' and action2=='attack':         # 방어 - 공격
             if val1 < val2 and special2 == 1:
-                hp1, special2 = critDMG(hp1, special2)
+                hp1, special2 = critDMG(hp1, special2, state1)
+                print("\n\n !!! !!! 역린 !!! !!!")
+                printbattleui(action1, action2, val1, val2, (10 + state1['vuln'] * 5))
             elif val1 < val2:
                 dmg = val2 - val1 + state1['vuln'] * 5
                 if dmg <= 0: dmg = 0
                 hp1 -= dmg
+                printbattleui(action1, action2, val1, val2, dmg)
             elif val1 > val2:
-                state2['paralysis'] += 1
+                state2['paralysis'] = 1
+                printbattleui(action1, action2, val1, val2, 0)
+                print("\n 반동 !\n 다음 턴 동안 적에게 마비 발생.")
             else:
+                printbattleui(action1, action2, val1, val2, 0)
                 continue
         else:                                                   # 방어 - 방어
             if val1 < val2:
                 state1['broken'] = 1
                 vuln(special2, state1, delay_state1)
+                printbattleui(action1, action2, val1, val2, 0)
+                print("\n 반동 !\n 다음 턴 동안 플레이어에게 무장 해제 발생.")
+                if special2 == 1:
+                    print("\n\n !! !! 기선 제압 !! !!\n 다음 턴 동안 플레이어가 추가적으로 취약 5 얻음\n")
             elif val1 > val2:
                 state2['broken'] = 1
-                vuln(special1, state1, delay_state1)
+                vuln(special1, state2, delay_state2)
+                printbattleui(action1, action2, val1, val2, 0)
+                print("\n 반동 !\n 다음 턴 동안 적에게 무장 해제 발생.")
+                if special1 == 1:
+                    print("\n\n !! !! 기선 제압 !! !!\n 다음 턴 동안 적이 추가적으로 취약 5 얻음\n")
             else:
+                printbattleui(action1, action2, val1, val2, 0)
                 continue
-    
-    return
+
+    return turn, hp1, hp2
+
+final_turn, final_hp1, final_hp2 = simulate_game()
+
+print(f'\n\n\n --- 게임 종료 ---\n\n 누적 턴: {final_turn}\n')
+
+if final_hp1 <= 0:
+    print(f" 패배 ...\n 적 남은 체력: {final_hp2}\n")
+elif final_hp2 <= 0:
+    print(f" 승리 !\n 남은 체력: {final_hp1}\n")
